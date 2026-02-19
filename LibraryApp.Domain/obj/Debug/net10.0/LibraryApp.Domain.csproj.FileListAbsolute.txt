@@ -1,0 +1,11 @@
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/bin/Debug/net10.0/LibraryApp.Domain.deps.json
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/bin/Debug/net10.0/LibraryApp.Domain.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/bin/Debug/net10.0/LibraryApp.Domain.pdb
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.AssemblyInfoInputs.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.AssemblyInfo.cs
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.csproj.CoreCompileInputs.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/refint/LibraryApp.Domain.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.pdb
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/ref/LibraryApp.Domain.dll

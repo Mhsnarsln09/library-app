@@ -1,0 +1,17 @@
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Infrastructure.deps.json
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Infrastructure.runtimeconfig.json
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Infrastructure.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Infrastructure.pdb
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Domain.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Domain.pdb
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.csproj.AssemblyReference.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.AssemblyInfoInputs.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.AssemblyInfo.cs
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.csproj.CoreCompileInputs.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryA.5EA4A9E6.Up2Date
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/refint/LibraryApp.Infrastructure.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.pdb
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.genruntimeconfig.cache
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/ref/LibraryApp.Infrastructure.dll
