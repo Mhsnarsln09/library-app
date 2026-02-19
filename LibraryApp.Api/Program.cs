@@ -1,6 +1,7 @@
-using LibraryApp.Domain.Entities;
 using LibraryApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using LibraryApp.Application.Services;
+using LibraryApp.Application.Abstractions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,12 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 
 var connectionString = builder.Configuration.GetConnectionString("LibraryDb");
 
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseNpgsql(connectionString));
+    
+builder.Services.AddScoped<AuthorsService>();
+
+
+builder.Services.AddScoped<ILibraryDb, LibraryDbContext>();
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
@@ -21,7 +28,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
     db.Database.Migrate();
 }
-
+app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

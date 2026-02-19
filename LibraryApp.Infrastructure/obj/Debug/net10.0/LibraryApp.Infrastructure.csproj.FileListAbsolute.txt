@@ -15,3 +15,6 @@
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.pdb
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.genruntimeconfig.cache
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/ref/LibraryApp.Infrastructure.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/obj/Debug/net10.0/LibraryApp.Infrastructure.sourcelink.json
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Application.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Infrastructure/bin/Debug/net10.0/LibraryApp.Application.pdb

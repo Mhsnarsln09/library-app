@@ -724,6 +724,21 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "LibraryApp.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v10.0",
+        "dependencies": {
+          "LibraryApp.Domain": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "10.0.3",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.3"
+        },
+        "compile": {
+          "bin/placeholder/LibraryApp.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LibraryApp.Application.dll": {}
+        }
+      },
       "LibraryApp.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
@@ -738,6 +753,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
+          "LibraryApp.Application": "1.0.0",
           "LibraryApp.Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "10.0.3",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
@@ -2596,6 +2612,11 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "LibraryApp.Application/1.0.0": {
+      "type": "project",
+      "path": "../LibraryApp.Application/LibraryApp.Application.csproj",
+      "msbuildProject": "../LibraryApp.Application/LibraryApp.Application.csproj"
+    },
     "LibraryApp.Domain/1.0.0": {
       "type": "project",
       "path": "../LibraryApp.Domain/LibraryApp.Domain.csproj",
@@ -2609,6 +2630,7 @@
   },
   "projectFileDependencyGroups": {
     "net10.0": [
+      "LibraryApp.Application >= 1.0.0",
       "LibraryApp.Domain >= 1.0.0",
       "LibraryApp.Infrastructure >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 10.0.3",
@@ -2642,6 +2664,9 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
+            "/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Application/LibraryApp.Application.csproj": {
+              "projectPath": "/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Application/LibraryApp.Application.csproj"
+            },
             "/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/LibraryApp.Domain.csproj": {
               "projectPath": "/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/LibraryApp.Domain.csproj"
             },

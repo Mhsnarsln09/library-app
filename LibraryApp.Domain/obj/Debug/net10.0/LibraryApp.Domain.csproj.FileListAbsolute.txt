@@ -9,3 +9,4 @@
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/refint/LibraryApp.Domain.dll
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.pdb
 /Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/ref/LibraryApp.Domain.dll
+/Users/muhsinarslan/Desktop/Projects/Personal/libraryapp/LibraryApp.Domain/obj/Debug/net10.0/LibraryApp.Domain.sourcelink.json

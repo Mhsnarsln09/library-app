@@ -1,17 +1,17 @@
 using LibraryApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using LibraryApp.Application.Abstractions;
 
 namespace LibraryApp.Infrastructure.Data;
 
-public class LibraryDbContext : DbContext
+public class LibraryDbContext : DbContext, ILibraryDb
 {
     public LibraryDbContext(DbContextOptions<LibraryDbContext> options) : base(options) { }
-
-    public DbSet<Book> Books => Set<Book>();
-    public DbSet<Author> Authors => Set<Author>();
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Member> Members => Set<Member>();
-    public DbSet<Loan> Loans => Set<Loan>();
+    public virtual DbSet<Author> Authors { get; set; }
+    public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Book> Books { get; set; }
+    public virtual DbSet<Member> Members { get; set; }
+    public virtual DbSet<Loan> Loans { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

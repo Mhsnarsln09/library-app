@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v10.0": {
       "LibraryApp.Api/1.0.0": {
         "dependencies": {
+          "LibraryApp.Application": "1.0.0",
           "LibraryApp.Domain": "1.0.0",
           "LibraryApp.Infrastructure": "1.0.0",
           "Microsoft.EntityFrameworkCore": "10.0.3",
@@ -525,6 +526,19 @@
           }
         }
       },
+      "LibraryApp.Application/1.0.0": {
+        "dependencies": {
+          "LibraryApp.Domain": "1.0.0",
+          "Microsoft.EntityFrameworkCore": "10.0.3",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.3"
+        },
+        "runtime": {
+          "LibraryApp.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "LibraryApp.Domain/1.0.0": {
         "runtime": {
           "LibraryApp.Domain.dll": {
@@ -535,6 +549,7 @@
       },
       "LibraryApp.Infrastructure/1.0.0": {
         "dependencies": {
+          "LibraryApp.Application": "1.0.0",
           "LibraryApp.Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "10.0.3",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "10.0.0"
@@ -756,6 +771,11 @@
       "sha512": "sha512-aRZlojCCGEHDKqh43jaDgaVpYETsgd7Nx4g1zwLKMtv4iTo0627715ajEFNpEEBTgLmvZuv8K0EVxc3sM4NWJA==",
       "path": "system.composition.typedparts/9.0.0",
       "hashPath": "system.composition.typedparts.9.0.0.nupkg.sha512"
+    },
+    "LibraryApp.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
     },
     "LibraryApp.Domain/1.0.0": {
       "type": "project",
