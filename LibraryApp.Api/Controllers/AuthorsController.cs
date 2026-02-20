@@ -25,5 +25,24 @@ public class AuthorsController(
         return await authorsService.GetAuthorsAsync();
     }
 
+    // GET /authors/{id}
+    [HttpGet("{id}")]
+    public async Task<ApiResponse<AuthorDetailDto>> GetAuthorById(int id, CancellationToken ct)
+    {
+        return await authorsService.GetAuthorByIdAsync(id, ct);
+    }
 
+    // PUT /authors/5
+    [HttpPut("{id}")]
+    public async Task<ApiResponse> UpdateAuthor(int id, [FromBody] UpdateAuthorDto request, CancellationToken ct)
+    {
+        return await authorsService.UpdateAuthorAsync(id, request.FullName, ct);
+    }
+
+    // DELETE /authors/5
+    [HttpDelete("{id}")]
+    public async Task<ApiResponse> DeleteAuthor(int id, CancellationToken ct)
+    {
+        return await authorsService.DeleteAuthorAsync(id, ct);
+    }
 }

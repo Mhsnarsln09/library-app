@@ -24,4 +24,39 @@ public class AuthorsService(ILibraryDb _db)
         var authors = await _db.Authors.Select(a => new AuthorListItemDto(a.Id, a.FullName)).ToListAsync(ct);
         return ApiResponse<List<AuthorListItemDto>>.Success(authors);
     }
+
+    public async Task<ApiResponse<AuthorDetailDto>> GetAuthorByIdAsync(int id, CancellationToken ct = default)
+    {
+        var author = await _db.Authors.FindAsync(new object[] { id }, ct);
+        if (author == null)
+            return ApiResponse<AuthorDetailDto>.Failure($"Author with ID {id} not found.");
+
+        return ApiResponse<AuthorDetailDto>.Success(new AuthorDetailDto(author.Id, author.FullName));
+    }
+
+    public async Task<ApiResponse> UpdateAuthorAsync(int id, string name, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required.", nameof(name));
+
+        var author = await _db.Authors.FindAsync(new object[] { id }, ct);
+        if (author == null)
+            return ApiResponse.Failure($"Author with ID {id} not found.");
+
+        author.FullName = name.Trim();
+        await _db.SaveChangesAsync(ct);
+        return ApiResponse.Success($"Author with ID {id} updated successfully.");
+    }
+
+    public async Task<ApiResponse> DeleteAuthorAsync(int id, CancellationToken ct = default)
+    {
+        var author = await _db.Authors.FindAsync(new object[] { id }, ct);
+        if (author == null)
+            return ApiResponse.Failure($"Author with ID {id} not found.");
+
+        _db.Authors.Remove(author);
+        await _db.SaveChangesAsync(ct);
+        return ApiResponse.Success($"Author with ID {id} deleted successfully.");
+    }
+
 }

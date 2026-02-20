@@ -18,6 +18,7 @@ builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseNpgsql(connectionString));
     
 builder.Services.AddScoped<AuthorsService>();
+builder.Services.AddScoped<CategoriesService>();
 
 
 builder.Services.AddScoped<ILibraryDb, LibraryDbContext>();
