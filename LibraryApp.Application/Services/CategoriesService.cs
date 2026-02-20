@@ -12,11 +12,15 @@ public class CategoriesService(ILibraryDb _db)
     public async Task<ApiResponse> CreateCategoryAsync(string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required.", nameof(name));
+            return ApiResponse.Failure("Name is required.");
 
         var trimmedName = name.Trim();
         if (trimmedName.Length < 2)
-            throw new ArgumentException("Name must be at least 2 characters long.", nameof(name));
+            return ApiResponse.Failure("Name must be at least 2 characters long.");
+
+        var exists = await _db.Categories.AnyAsync(c => c.Name == trimmedName, ct);
+        if (exists)
+            return ApiResponse.Failure($"Category '{trimmedName}' already exists.");
 
         var category = new Category { Name = trimmedName };
         await _db.Categories.AddAsync(category, ct);
@@ -42,13 +46,21 @@ public class CategoriesService(ILibraryDb _db)
     public async Task<ApiResponse> UpdateCategoryAsync(int id, string name, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Name is required.", nameof(name));
+            return ApiResponse.Failure("Name is required.");
+
+        var trimmedName = name.Trim();
+        if (trimmedName.Length < 2)
+            return ApiResponse.Failure("Name must be at least 2 characters long.");
 
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)
             return ApiResponse.Failure($"Category with ID {id} not found.");
 
-        category.Name = name.Trim();
+        var duplicate = await _db.Categories.AnyAsync(c => c.Name == trimmedName && c.Id != id, ct);
+        if (duplicate)
+            return ApiResponse.Failure($"Category '{trimmedName}' already exists.");
+
+        category.Name = trimmedName;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Category with ID {id} updated successfully.");
     }
@@ -58,6 +70,10 @@ public class CategoriesService(ILibraryDb _db)
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)
             return ApiResponse.Failure($"Category with ID {id} not found.");
+
+        var hasBooks = await _db.Books.AnyAsync(b => b.CategoryId == id, ct);
+        if (hasBooks)
+            return ApiResponse.Failure("Cannot delete category because there are books associated with this category.");
 
         _db.Categories.Remove(category);
         await _db.SaveChangesAsync(ct);

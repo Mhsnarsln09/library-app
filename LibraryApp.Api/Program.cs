@@ -19,6 +19,9 @@ builder.Services.AddDbContext<LibraryDbContext>(options =>
     
 builder.Services.AddScoped<AuthorsService>();
 builder.Services.AddScoped<CategoriesService>();
+builder.Services.AddScoped<BooksService>();
+builder.Services.AddScoped<MembersService>();
+builder.Services.AddScoped<LoansService>();
 
 
 builder.Services.AddScoped<ILibraryDb, LibraryDbContext>();
