@@ -12,13 +12,19 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         var statusCode = exception switch
         {
             LibraryApp.Application.Common.Exceptions.NotFoundException => StatusCodes.Status404NotFound,
+            LibraryApp.Application.Common.Exceptions.ForbiddenException => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError
         };
 
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title = statusCode == 404 ? "Not Found" : "Server Error",
+            Title = statusCode switch
+            {
+                404 => "Not Found",
+                403 => "Forbidden",
+                _ => "Server Error"
+            },
             Detail = exception.Message 
         };
 
