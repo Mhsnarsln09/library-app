@@ -10,6 +10,7 @@ public class MappingProfile : Profile
     {
         CreateMap<Category, CategoryListItemDto>();
         CreateMap<Author, AuthorDetailDto>();
+        CreateMap<Author, AuthorListItemDto>();
 
         CreateMap<Book, BookListItemDto>()
             .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.Author))
