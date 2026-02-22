@@ -1,9 +1,9 @@
+using LibraryApp.Domain.Common;
+
 namespace LibraryApp.Domain.Entities;
 
-public class Loan
+public class Loan : BaseEntity
 {
-    public int Id { get; set; }
-
     public int BookId { get; set; }
     public Book? Book { get; set; }
 
@@ -19,6 +19,8 @@ public class Loan
 
     public bool IsReturned => ReturnedAtUtc is not null;
     public bool IsOverdue => !IsReturned && DateTime.UtcNow > DueAtUtc;
+    
+    public decimal PenaltyAmount { get; set; }
 
     public void MarkReturned() => ReturnedAtUtc = DateTime.UtcNow;
 }

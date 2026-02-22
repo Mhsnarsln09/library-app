@@ -1,11 +1,15 @@
+using LibraryApp.Domain.Constants;
 using LibraryApp.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using LibraryApp.Application.Services;
 using LibraryApp.Application.Common;
+using LibraryApp.Application.Common.Pagination;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryApp.Api.Controllers;
 
 [ApiController]
+[Authorize(Roles = Roles.Admin)]
 public class MembersController(
     MembersService membersService
 ) : BaseController
@@ -19,9 +23,9 @@ public class MembersController(
 
     // GET /api/members
     [HttpGet]
-    public async Task<ApiResponse<List<MemberListItemDto>>> GetMembers(CancellationToken ct)
+    public async Task<ApiResponse<PagedResult<MemberListItemDto>>> GetMembers([FromQuery] PaginationFilter filter, CancellationToken ct)
     {
-        return await membersService.GetMembersAsync(ct);
+        return await membersService.GetMembersAsync(filter, ct);
     }
 
     // GET /api/members/{id}
@@ -43,5 +47,13 @@ public class MembersController(
     public async Task<ApiResponse> DeleteMember(int id, CancellationToken ct)
     {
         return await membersService.DeleteMemberAsync(id, ct);
+    }
+
+    // GET /api/members/{id}/penalties
+    [HttpGet("{id}/penalties")]
+    // [Authorize(Roles = Roles.Admin)] // Bu endpoint admin yetkisi gerektirebilir veya member kendi id si ile istek atabilir
+    public async Task<ApiResponse<MemberPenaltyDto>> GetMemberPenalties(int id, CancellationToken ct)
+    {
+        return await membersService.GetMemberPenaltiesAsync(id, ct);
     }
 }

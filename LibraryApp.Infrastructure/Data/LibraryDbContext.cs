@@ -1,3 +1,4 @@
+using LibraryApp.Domain.Common;
 using LibraryApp.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using LibraryApp.Application.Abstractions;
@@ -16,54 +17,26 @@ public class LibraryDbContext : DbContext, ILibraryDb
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(LibraryDbContext).Assembly);
+    }
 
-        modelBuilder.Entity<Book>()
-            .HasOne(b => b.Author)
-            .WithMany(a => a.Books)
-            .HasForeignKey(b => b.AuthorId)
-            .OnDelete(DeleteBehavior.Restrict);
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries<BaseEntity>();
 
-        modelBuilder.Entity<Book>()
-            .HasOne(b => b.Category)
-            .WithMany(c => c.Books)
-            .HasForeignKey(b => b.CategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Loan>()
-            .HasOne(l => l.Book)
-            .WithMany(b => b.Loans)
-            .HasForeignKey(l => l.BookId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Loan>()
-            .HasOne(l => l.Member)
-            .WithMany(m => m.Loans)
-            .HasForeignKey(l => l.MemberId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Author>().HasData(
-            new Author { Id = 1, FullName = "George Orwell" }
-        );
-
-        modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "Dystopian" }
-        );
-
-        modelBuilder.Entity<Book>().HasData(
-            new Book
+        foreach (var entry in entries)
+        {
+            switch (entry.State)
             {
-                Id = 1,
-                Title = "1984",
-                Isbn = "978-0451524935",
-                TotalCopies = 3,
-                AuthorId = 1,
-                CategoryId = 1
+                case EntityState.Added:
+                    entry.Entity.CreatedAtUtc = DateTime.UtcNow;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.UpdatedAtUtc = DateTime.UtcNow;
+                    break;
             }
-            
-        );
+        }
 
-        modelBuilder.Entity<Member>().HasData(
-            new Member { Id = 1, FullName = "Ada Lovelace", Email = "ada@example.com" }
-        );
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

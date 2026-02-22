@@ -1,22 +1,27 @@
 using LibraryApp.Application.Abstractions;
 using LibraryApp.Domain.Entities;
 using LibraryApp.Application.Common;
-using Microsoft.EntityFrameworkCore;
 using LibraryApp.Application.Contracts;
+using LibraryApp.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using LibraryApp.Application.Common.Pagination;
+
+using AutoMapper;
 
 namespace LibraryApp.Application.Services;
 
-public class LoansService(ILibraryDb _db)
+public class LoansService(ILibraryDb _db, IMapper _mapper)
 {
+    private const decimal DailyPenaltyRate = 1.50m;
     public async Task<ApiResponse> CreateLoanAsync(int bookId, int memberId, CancellationToken ct = default)
     {
         var book = await _db.Books.FindAsync(new object[] { bookId }, ct);
         if (book == null)
-            return ApiResponse.Failure($"Book with ID {bookId} not found.");
+            throw new NotFoundException($"Book with ID {bookId} not found.");
 
         var member = await _db.Members.FindAsync(new object[] { memberId }, ct);
         if (member == null)
-            return ApiResponse.Failure($"Member with ID {memberId} not found.");
+            throw new NotFoundException($"Member with ID {memberId} not found.");
 
         var alreadyBorrowed = await _db.Loans.AnyAsync(
             l => l.BookId == bookId && l.MemberId == memberId && l.ReturnedAtUtc == null, ct);
@@ -33,24 +38,23 @@ public class LoansService(ILibraryDb _db)
         return ApiResponse.Success($"Loan created with ID {loan.Id}.");
     }
 
-    public async Task<ApiResponse<List<LoanListItemDto>>> GetLoansAsync(CancellationToken ct = default)
+    public async Task<ApiResponse<PagedResult<LoanListItemDto>>> GetLoansAsync(PaginationFilter filter, CancellationToken ct = default)
     {
-        var loans = await _db.Loans
+        var query = _db.Loans
             .Include(l => l.Book)
-            .Include(l => l.Member)
+            .Include(l => l.Member);
+
+        var totalCount = await query.CountAsync(ct);
+
+        var loans = await query
             .OrderByDescending(l => l.LoanedAtUtc)
-            .Select(l => new LoanListItemDto(
-                l.Id,
-                l.Book!.Title,
-                l.Member!.FullName,
-                l.LoanedAtUtc,
-                l.DueAtUtc,
-                l.IsReturned,
-                l.IsOverdue
-            ))
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
             .ToListAsync(ct);
 
-        return ApiResponse<List<LoanListItemDto>>.Success(loans);
+        var dtos = _mapper.Map<List<LoanListItemDto>>(loans);
+        var pagedResult = new PagedResult<LoanListItemDto>(dtos, totalCount, filter.PageNumber, filter.PageSize);
+        return ApiResponse<PagedResult<LoanListItemDto>>.Success(pagedResult);
     }
 
     public async Task<ApiResponse<LoanDetailDto>> GetLoanByIdAsync(int id, CancellationToken ct = default)
@@ -64,56 +68,55 @@ public class LoansService(ILibraryDb _db)
             .FirstOrDefaultAsync(l => l.Id == id, ct);
 
         if (loan == null)
-            return ApiResponse<LoanDetailDto>.Failure($"Loan with ID {id} not found.");
+            throw new NotFoundException($"Loan with ID {id} not found.");
 
-        var bookDto = new BookListItemDto(
-            loan.Book!.Id,
-            loan.Book.Title,
-            loan.Book.TotalCopies,
-            new AuthorDetailDto(loan.Book.Author!.Id, loan.Book.Author.FullName),
-            new CategoryListItemDto(loan.Book.Category!.Id, loan.Book.Category.Name)
-        );
-
-        var memberDto = new MemberListItemDto(loan.Member!.Id, loan.Member.FullName, loan.Member.Email);
-
-        var loanDetail = new LoanDetailDto(
-            loan.Id,
-            bookDto,
-            memberDto,
-            loan.LoanedAtUtc,
-            loan.DueAtUtc,
-            loan.ReturnedAtUtc,
-            loan.IsReturned,
-            loan.IsOverdue
-        );
-
+        var loanDetail = _mapper.Map<LoanDetailDto>(loan);
         return ApiResponse<LoanDetailDto>.Success(loanDetail);
     }
 
     public async Task<ApiResponse> ReturnLoanAsync(int id, CancellationToken ct = default)
     {
-        var loan = await _db.Loans.FindAsync(new object[] { id }, ct);
+        var loan = await _db.Loans
+            .Include(l => l.Member)
+            .FirstOrDefaultAsync(l => l.Id == id, ct);
         if (loan == null)
-            return ApiResponse.Failure($"Loan with ID {id} not found.");
+            throw new NotFoundException($"Loan with ID {id} not found.");
 
         if (loan.IsReturned)
             return ApiResponse.Failure($"Loan with ID {id} has already been returned.");
 
         loan.MarkReturned();
+
+        // Calculate overdue penalty
+        if (loan.ReturnedAtUtc > loan.DueAtUtc)
+        {
+            var overdueDays = (int)Math.Ceiling((loan.ReturnedAtUtc!.Value - loan.DueAtUtc).TotalDays);
+            loan.PenaltyAmount = overdueDays * DailyPenaltyRate;
+            
+            if (loan.Member != null)
+                loan.Member.TotalPenalty += loan.PenaltyAmount;
+        }
+
         await _db.SaveChangesAsync(ct);
-        return ApiResponse.Success($"Loan with ID {id} returned successfully.");
+        
+        var message = loan.PenaltyAmount > 0
+            ? $"Loan with ID {id} returned with a penalty of {loan.PenaltyAmount:F2} TL ({(int)Math.Ceiling((loan.ReturnedAtUtc!.Value - loan.DueAtUtc).TotalDays)} days overdue)."
+            : $"Loan with ID {id} returned successfully.";
+
+        return ApiResponse.Success(message);
     }
 
     public async Task<ApiResponse> DeleteLoanAsync(int id, CancellationToken ct = default)
     {
         var loan = await _db.Loans.FindAsync(new object[] { id }, ct);
         if (loan == null)
-            return ApiResponse.Failure($"Loan with ID {id} not found.");
+            throw new NotFoundException($"Loan with ID {id} not found.");
 
         if (!loan.IsReturned)
             return ApiResponse.Failure("Cannot delete an active loan. Please return the book first.");
 
-        _db.Loans.Remove(loan);
+        loan.IsDeleted = true;
+        loan.DeletedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Loan with ID {id} deleted successfully.");
     }

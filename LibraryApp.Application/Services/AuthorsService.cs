@@ -1,12 +1,16 @@
 using LibraryApp.Application.Abstractions;
 using LibraryApp.Domain.Entities;
 using LibraryApp.Application.Common;
-using Microsoft.EntityFrameworkCore;   
 using LibraryApp.Application.Contracts;
+using LibraryApp.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using LibraryApp.Application.Common.Pagination;
+
+using AutoMapper;
 
 namespace LibraryApp.Application.Services;
 
-public class AuthorsService(ILibraryDb _db)
+public class AuthorsService(ILibraryDb _db, IMapper _mapper)
 {
     public async Task<ApiResponse> CreateAuthorAsync(string name, CancellationToken ct = default)
     {
@@ -27,19 +31,29 @@ public class AuthorsService(ILibraryDb _db)
         return ApiResponse.Success($"Author '{author.FullName}' created with ID {author.Id}.");
     }
 
-    public async Task<ApiResponse<List<AuthorListItemDto>>> GetAuthorsAsync(CancellationToken ct = default)
+    public async Task<ApiResponse<PagedResult<AuthorListItemDto>>> GetAuthorsAsync(PaginationFilter filter, CancellationToken ct = default)
     {
-        var authors = await _db.Authors.Select(a => new AuthorListItemDto(a.Id, a.FullName)).ToListAsync(ct);
-        return ApiResponse<List<AuthorListItemDto>>.Success(authors);
+        var query = _db.Authors;
+        var totalCount = await query.CountAsync(ct);
+        
+        var authors = await query
+            .OrderBy(a => a.FullName)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(ct);
+            
+        var dtos = _mapper.Map<List<AuthorListItemDto>>(authors);
+        var pagedResult = new PagedResult<AuthorListItemDto>(dtos, totalCount, filter.PageNumber, filter.PageSize);
+        return ApiResponse<PagedResult<AuthorListItemDto>>.Success(pagedResult);
     }
 
     public async Task<ApiResponse<AuthorDetailDto>> GetAuthorByIdAsync(int id, CancellationToken ct = default)
     {
         var author = await _db.Authors.FindAsync(new object[] { id }, ct);
         if (author == null)
-            return ApiResponse<AuthorDetailDto>.Failure($"Author with ID {id} not found.");
+            throw new NotFoundException($"Author with ID {id} not found.");
 
-        return ApiResponse<AuthorDetailDto>.Success(new AuthorDetailDto(author.Id, author.FullName));
+        return ApiResponse<AuthorDetailDto>.Success(_mapper.Map<AuthorDetailDto>(author));
     }
 
     public async Task<ApiResponse> UpdateAuthorAsync(int id, string name, CancellationToken ct = default)
@@ -53,7 +67,7 @@ public class AuthorsService(ILibraryDb _db)
 
         var author = await _db.Authors.FindAsync(new object[] { id }, ct);
         if (author == null)
-            return ApiResponse.Failure($"Author with ID {id} not found.");
+            throw new NotFoundException($"Author with ID {id} not found.");
 
         var duplicate = await _db.Authors.AnyAsync(a => a.FullName == trimmedName && a.Id != id, ct);
         if (duplicate)
@@ -68,13 +82,14 @@ public class AuthorsService(ILibraryDb _db)
     {
         var author = await _db.Authors.FindAsync(new object[] { id }, ct);
         if (author == null)
-            return ApiResponse.Failure($"Author with ID {id} not found.");
+            throw new NotFoundException($"Author with ID {id} not found.");
 
         var hasBooks = await _db.Books.AnyAsync(b => b.AuthorId == id, ct);
         if (hasBooks)
             return ApiResponse.Failure("Cannot delete author because there are books associated with this author.");
 
-        _db.Authors.Remove(author);
+        author.IsDeleted = true;
+        author.DeletedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Author with ID {id} deleted successfully.");
     }

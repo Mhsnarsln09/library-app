@@ -1,17 +1,22 @@
+using LibraryApp.Domain.Constants;
 using LibraryApp.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using LibraryApp.Application.Services;
 using LibraryApp.Application.Common;
+using LibraryApp.Application.Common.Pagination;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryApp.Api.Controllers;
 
-[ApiController]        
+[ApiController]
+[Authorize]
 public class CategoriesController(
     CategoriesService categoriesService
 ) : BaseController
 {
     // POST /categories
     [HttpPost]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> CreateCategory([FromBody] CreateCategoryDto request, CancellationToken ct)
     {
         return await categoriesService.CreateCategoryAsync(request.Name, ct);
@@ -19,9 +24,9 @@ public class CategoriesController(
 
     // GET /categories
     [HttpGet]
-    public async Task<ApiResponse<List<CategoryListItemDto>>> GetCategories()
+    public async Task<ApiResponse<PagedResult<CategoryListItemDto>>> GetCategories([FromQuery] PaginationFilter filter, CancellationToken ct)
     {
-        return await categoriesService.GetCategoriesAsync();
+        return await categoriesService.GetCategoriesAsync(filter, ct);
     }
 
     // GET /categories/{id}
@@ -33,6 +38,7 @@ public class CategoriesController(
 
     // PUT /categories/5
     [HttpPut("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> UpdateCategory(int id, [FromBody] UpdateCategoryDto request, CancellationToken ct)
     {
         return await categoriesService.UpdateCategoryAsync(id, request.Name, ct);
@@ -40,6 +46,7 @@ public class CategoriesController(
 
     // DELETE /categories/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> DeleteCategory(int id, CancellationToken ct)
     {
         return await categoriesService.DeleteCategoryAsync(id, ct);

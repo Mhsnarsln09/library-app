@@ -1,13 +1,16 @@
 using LibraryApp.Application.Abstractions;
 using LibraryApp.Domain.Entities;
 using LibraryApp.Application.Common;
-using Microsoft.EntityFrameworkCore;   
 using LibraryApp.Application.Contracts;
+using LibraryApp.Application.Common.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using LibraryApp.Application.Common.Pagination;
 
+using AutoMapper;
 
 namespace LibraryApp.Application.Services;
 
-public class CategoriesService(ILibraryDb _db)
+public class CategoriesService(ILibraryDb _db, IMapper _mapper)
 {
     public async Task<ApiResponse> CreateCategoryAsync(string name, CancellationToken ct = default)
     {
@@ -28,19 +31,29 @@ public class CategoriesService(ILibraryDb _db)
         return ApiResponse.Success($"Category '{category.Name}' created with ID {category.Id}.");
     }
 
-    public async Task<ApiResponse<List<CategoryListItemDto>>> GetCategoriesAsync(CancellationToken ct = default)
+    public async Task<ApiResponse<PagedResult<CategoryListItemDto>>> GetCategoriesAsync(PaginationFilter filter, CancellationToken ct = default)
     {
-        var categories = await _db.Categories.OrderBy(c => c.Name).Select(c => new CategoryListItemDto(c.Id, c.Name)).ToListAsync(ct);
-        return ApiResponse<List<CategoryListItemDto>>.Success(categories);
+        var query = _db.Categories;
+        var totalCount = await query.CountAsync(ct);
+        
+        var categories = await query
+            .OrderBy(c => c.Name)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(ct);
+            
+        var dtos = _mapper.Map<List<CategoryListItemDto>>(categories);
+        var pagedResult = new PagedResult<CategoryListItemDto>(dtos, totalCount, filter.PageNumber, filter.PageSize);
+        return ApiResponse<PagedResult<CategoryListItemDto>>.Success(pagedResult);
     }
 
     public async Task<ApiResponse<CategoryDetailDto>> GetCategoryByIdAsync(int id, CancellationToken ct = default)
     {
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)
-            return ApiResponse<CategoryDetailDto>.Failure($"Category with ID {id} not found.");
+            throw new NotFoundException($"Category with ID {id} not found.");
 
-        return ApiResponse<CategoryDetailDto>.Success(new CategoryDetailDto(category.Id, category.Name));
+        return ApiResponse<CategoryDetailDto>.Success(_mapper.Map<CategoryDetailDto>(category));
     }
 
     public async Task<ApiResponse> UpdateCategoryAsync(int id, string name, CancellationToken ct = default)
@@ -54,7 +67,7 @@ public class CategoriesService(ILibraryDb _db)
 
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)
-            return ApiResponse.Failure($"Category with ID {id} not found.");
+            throw new NotFoundException($"Category with ID {id} not found.");
 
         var duplicate = await _db.Categories.AnyAsync(c => c.Name == trimmedName && c.Id != id, ct);
         if (duplicate)
@@ -69,13 +82,14 @@ public class CategoriesService(ILibraryDb _db)
     {
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)
-            return ApiResponse.Failure($"Category with ID {id} not found.");
+            throw new NotFoundException($"Category with ID {id} not found.");
 
         var hasBooks = await _db.Books.AnyAsync(b => b.CategoryId == id, ct);
         if (hasBooks)
             return ApiResponse.Failure("Cannot delete category because there are books associated with this category.");
 
-        _db.Categories.Remove(category);
+        category.IsDeleted = true;
+        category.DeletedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Category with ID {id} deleted successfully.");
     }

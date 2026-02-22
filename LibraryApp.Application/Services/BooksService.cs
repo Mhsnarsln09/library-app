@@ -3,11 +3,15 @@ using LibraryApp.Domain.Entities;
 using LibraryApp.Application.Common;
 using Microsoft.EntityFrameworkCore;   
 using LibraryApp.Application.Contracts;
+using LibraryApp.Application.Common.Exceptions;
+using LibraryApp.Application.Common.Pagination;
 
+
+using AutoMapper;
 
 namespace LibraryApp.Application.Services;
 
-public class BooksService(ILibraryDb _db)
+public class BooksService(ILibraryDb _db, IMapper _mapper)
 {
     public async Task<ApiResponse> CreateBookAsync(string title, int authorId, int categoryId, CancellationToken ct = default)
     {
@@ -20,11 +24,11 @@ public class BooksService(ILibraryDb _db)
 
         var author = await _db.Authors.FindAsync(new object[] { authorId }, ct);
         if (author == null)
-            return ApiResponse.Failure($"Author with ID {authorId} not found.");
+            throw new NotFoundException($"Author with ID {authorId} not found.");
 
         var category = await _db.Categories.FindAsync(new object[] { categoryId }, ct);
         if (category == null)
-            return ApiResponse.Failure($"Category with ID {categoryId} not found.");
+            throw new NotFoundException($"Category with ID {categoryId} not found.");
 
         var book = new Book { Title = trimmedTitle, AuthorId = authorId, CategoryId = categoryId };
         await _db.Books.AddAsync(book, ct);
@@ -32,15 +36,23 @@ public class BooksService(ILibraryDb _db)
         return ApiResponse.Success($"Book '{book.Title}' created with ID {book.Id}.");
     }
 
-    public async Task<ApiResponse<List<BookListItemDto>>> GetBooksAsync(CancellationToken ct = default)
+    public async Task<ApiResponse<PagedResult<BookListItemDto>>> GetBooksAsync(PaginationFilter filter, CancellationToken ct = default)
     {
-        var books = await _db.Books
+        var query = _db.Books
             .Include(b => b.Author)
-            .Include(b => b.Category)
-            .Select(b => new BookListItemDto(b.Id, b.Title, b.TotalCopies, new AuthorDetailDto(b.Author.Id, b.Author.FullName), new CategoryListItemDto(b.Category.Id, b.Category.Name)))
-            .ToListAsync(ct);
+            .Include(b => b.Category);
 
-        return ApiResponse<List<BookListItemDto>>.Success(books);
+        var totalCount = await query.CountAsync(ct);
+
+        var books = await query
+            .OrderByDescending(b => b.Id)
+            .Skip((filter.PageNumber - 1) * filter.PageSize)
+            .Take(filter.PageSize)
+            .ToListAsync(ct);
+            
+        var dtos = _mapper.Map<List<BookListItemDto>>(books);
+        var pagedResult = new PagedResult<BookListItemDto>(dtos, totalCount, filter.PageNumber, filter.PageSize);
+        return ApiResponse<PagedResult<BookListItemDto>>.Success(pagedResult);
     }
 
     public async Task<ApiResponse<BookDetailDto>> GetBookByIdAsync(int id, CancellationToken ct = default)
@@ -51,9 +63,9 @@ public class BooksService(ILibraryDb _db)
             .FirstOrDefaultAsync(b => b.Id == id, ct);
 
         if (book == null)
-            return ApiResponse<BookDetailDto>.Failure($"Book with ID {id} not found.");
+            throw new NotFoundException($"Book with ID {id} not found.");
 
-        var bookDetail = new BookDetailDto(book.Id, book.Title, book.Isbn, book.TotalCopies, new AuthorDetailDto(book.Author.Id, book.Author.FullName), new CategoryListItemDto(book.Category.Id, book.Category.Name));
+        var bookDetail = _mapper.Map<BookDetailDto>(book);
         return ApiResponse<BookDetailDto>.Success(bookDetail);
     }
 
@@ -68,15 +80,15 @@ public class BooksService(ILibraryDb _db)
 
         var book = await _db.Books.FindAsync(new object[] { id }, ct);
         if (book == null)
-            return ApiResponse.Failure($"Book with ID {id} not found.");
+            throw new NotFoundException($"Book with ID {id} not found.");
 
         var author = await _db.Authors.FindAsync(new object[] { authorId }, ct);
         if (author == null)
-            return ApiResponse.Failure($"Author with ID {authorId} not found.");
+            throw new NotFoundException($"Author with ID {authorId} not found.");
 
         var category = await _db.Categories.FindAsync(new object[] { categoryId }, ct);
         if (category == null)
-            return ApiResponse.Failure($"Category with ID {categoryId} not found.");
+            throw new NotFoundException($"Category with ID {categoryId} not found.");
 
         book.Title = trimmedTitle;
         book.AuthorId = authorId;
@@ -89,13 +101,14 @@ public class BooksService(ILibraryDb _db)
     {
         var book = await _db.Books.FindAsync(new object[] { id }, ct);
         if (book == null)
-            return ApiResponse.Failure($"Book with ID {id} not found.");
+            throw new NotFoundException($"Book with ID {id} not found.");
 
         var hasActiveLoans = await _db.Loans.AnyAsync(l => l.BookId == id && l.ReturnedAtUtc == null, ct);
         if (hasActiveLoans)
             return ApiResponse.Failure("Cannot delete book because it has active (unreturned) loans.");
 
-        _db.Books.Remove(book);
+        book.IsDeleted = true;
+        book.DeletedAtUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Book with ID {id} deleted successfully.");
     }

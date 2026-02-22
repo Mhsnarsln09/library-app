@@ -30,9 +30,22 @@ namespace LibraryApp.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -42,7 +55,9 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                         new
                         {
                             Id = 1,
-                            FullName = "George Orwell"
+                            CreatedAtUtc = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            FullName = "George Orwell",
+                            IsDeleted = false
                         });
                 });
 
@@ -60,18 +75,32 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Isbn")
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("PublishedYear")
                         .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("TotalCopies")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -87,8 +116,10 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                             Id = 1,
                             AuthorId = 1,
                             CategoryId = 1,
+                            CreatedAtUtc = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
                             Isbn = "978-0451524935",
-                            PublishedYear = 0,
+                            PublishedYear = 1949,
                             Title = "1984",
                             TotalCopies = 3
                         });
@@ -102,9 +133,22 @@ namespace LibraryApp.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -114,6 +158,8 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                         new
                         {
                             Id = 1,
+                            CreatedAtUtc = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IsDeleted = false,
                             Name = "Dystopian"
                         });
                 });
@@ -129,8 +175,17 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                     b.Property<int>("BookId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("DueAtUtc")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("LoanedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -138,7 +193,13 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                     b.Property<int>("MemberId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("PenaltyAmount")
+                        .HasColumnType("numeric");
+
                     b.Property<DateTime?>("ReturnedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
@@ -158,15 +219,43 @@ namespace LibraryApp.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TotalPenalty")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Members");
 
@@ -174,8 +263,13 @@ namespace LibraryApp.Infrastructure.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Email = "ada@example.com",
-                            FullName = "Ada Lovelace"
+                            CreatedAtUtc = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Email = "admin@library.com",
+                            FullName = "Admin User",
+                            IsDeleted = false,
+                            PasswordHash = "$2a$11$x5RZfGMl5sCqaP6IoJNM4eK1SitGbDJfYGNaIXZfzJGKfE3cXHfNi",
+                            Role = "Admin",
+                            TotalPenalty = 0m
                         });
                 });
 

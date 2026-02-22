@@ -1,17 +1,22 @@
+using LibraryApp.Domain.Constants;
 using LibraryApp.Application.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using LibraryApp.Application.Services;
 using LibraryApp.Application.Common;
+using LibraryApp.Application.Common.Pagination;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryApp.Api.Controllers;
 
-[ApiController]        
+[ApiController]
+[Authorize]
 public class AuthorsController(
     AuthorsService authorsService
 ) : BaseController
 {
     // POST /authors
     [HttpPost]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> CreateAuthor([FromBody] CreateAuthorDto request, CancellationToken ct)
     {
 
@@ -20,9 +25,9 @@ public class AuthorsController(
 
      // GET /authors
     [HttpGet]
-    public async Task<ApiResponse<List<AuthorListItemDto>>> GetAuthors()
+    public async Task<ApiResponse<PagedResult<AuthorListItemDto>>> GetAuthors([FromQuery] PaginationFilter filter, CancellationToken ct)
     {
-        return await authorsService.GetAuthorsAsync();
+        return await authorsService.GetAuthorsAsync(filter, ct);
     }
 
     // GET /authors/{id}
@@ -34,6 +39,7 @@ public class AuthorsController(
 
     // PUT /authors/5
     [HttpPut("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> UpdateAuthor(int id, [FromBody] UpdateAuthorDto request, CancellationToken ct)
     {
         return await authorsService.UpdateAuthorAsync(id, request.FullName, ct);
@@ -41,6 +47,7 @@ public class AuthorsController(
 
     // DELETE /authors/5
     [HttpDelete("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ApiResponse> DeleteAuthor(int id, CancellationToken ct)
     {
         return await authorsService.DeleteAuthorAsync(id, ct);

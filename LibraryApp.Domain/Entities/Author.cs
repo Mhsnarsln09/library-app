@@ -1,8 +1,9 @@
+using LibraryApp.Domain.Common;
+
 namespace LibraryApp.Domain.Entities;
 
-public class Author
+public class Author : BaseEntity
 {
-    public int Id { get; set; }
     public required string FullName { get; set; }
 
     // İleride EF Core ilişki kuracak
