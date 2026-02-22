@@ -15,12 +15,7 @@ public class BooksService(ILibraryDb _db, IMapper _mapper)
 {
     public async Task<ApiResponse> CreateBookAsync(string title, int authorId, int categoryId, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            return ApiResponse.Failure("Title is required.");
-
         var trimmedTitle = title.Trim();
-        if (trimmedTitle.Length < 2)
-            return ApiResponse.Failure("Title must be at least 2 characters long.");
 
         var author = await _db.Authors.FindAsync(new object[] { authorId }, ct);
         if (author == null)
@@ -71,12 +66,7 @@ public class BooksService(ILibraryDb _db, IMapper _mapper)
 
     public async Task<ApiResponse> UpdateBookAsync(int id, string title, int authorId, int categoryId, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            return ApiResponse.Failure("Title is required.");
-
         var trimmedTitle = title.Trim();
-        if (trimmedTitle.Length < 2)
-            return ApiResponse.Failure("Title must be at least 2 characters long.");
 
         var book = await _db.Books.FindAsync(new object[] { id }, ct);
         if (book == null)

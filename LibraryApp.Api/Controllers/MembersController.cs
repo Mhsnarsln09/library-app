@@ -14,13 +14,6 @@ public class MembersController(
     MembersService membersService
 ) : BaseController
 {
-    // POST /api/members
-    [HttpPost]
-    public async Task<ApiResponse> CreateMember([FromBody] CreateMemberDto request, CancellationToken ct)
-    {
-        return await membersService.CreateMemberAsync(request.FullName, request.Email, ct);
-    }
-
     // GET /api/members
     [HttpGet]
     public async Task<ApiResponse<PagedResult<MemberListItemDto>>> GetMembers([FromQuery] PaginationFilter filter, CancellationToken ct)
@@ -39,7 +32,7 @@ public class MembersController(
     [HttpPut("{id}")]
     public async Task<ApiResponse> UpdateMember(int id, [FromBody] UpdateMemberDto request, CancellationToken ct)
     {
-        return await membersService.UpdateMemberAsync(id, request.FullName, request.Email, ct);
+        return await membersService.UpdateMemberAsync(id, request.FullName, request.Email, request.Role, ct);
     }
 
     // DELETE /api/members/{id}

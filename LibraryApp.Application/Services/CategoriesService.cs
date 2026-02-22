@@ -14,12 +14,7 @@ public class CategoriesService(ILibraryDb _db, IMapper _mapper)
 {
     public async Task<ApiResponse> CreateCategoryAsync(string name, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return ApiResponse.Failure("Name is required.");
-
         var trimmedName = name.Trim();
-        if (trimmedName.Length < 2)
-            return ApiResponse.Failure("Name must be at least 2 characters long.");
 
         var exists = await _db.Categories.AnyAsync(c => c.Name == trimmedName, ct);
         if (exists)
@@ -58,12 +53,7 @@ public class CategoriesService(ILibraryDb _db, IMapper _mapper)
 
     public async Task<ApiResponse> UpdateCategoryAsync(int id, string name, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            return ApiResponse.Failure("Name is required.");
-
         var trimmedName = name.Trim();
-        if (trimmedName.Length < 2)
-            return ApiResponse.Failure("Name must be at least 2 characters long.");
 
         var category = await _db.Categories.FindAsync(new object[] { id }, ct);
         if (category == null)

@@ -13,35 +13,6 @@ namespace LibraryApp.Application.Services;
 
 public class MembersService(ILibraryDb _db, IMapper _mapper)
 {
-    private static bool IsValidEmail(string email)
-        => MailAddress.TryCreate(email, out _);
-
-    public async Task<ApiResponse> CreateMemberAsync(string fullName, string email, CancellationToken ct = default)
-    {
-        if (string.IsNullOrWhiteSpace(fullName))
-            return ApiResponse.Failure("FullName is required.");
-
-        var trimmedName = fullName.Trim();
-        if (trimmedName.Length < 2)
-            return ApiResponse.Failure("FullName must be at least 2 characters long.");
-
-        if (string.IsNullOrWhiteSpace(email))
-            return ApiResponse.Failure("Email is required.");
-
-        var trimmedEmail = email.Trim().ToLowerInvariant();
-        if (!IsValidEmail(trimmedEmail))
-            return ApiResponse.Failure("Email format is invalid.");
-
-        var emailExists = await _db.Members.AnyAsync(m => m.Email == trimmedEmail, ct);
-        if (emailExists)
-            return ApiResponse.Failure($"A member with email '{trimmedEmail}' already exists.");
-
-        var member = new Member { FullName = trimmedName, Email = trimmedEmail };
-        await _db.Members.AddAsync(member, ct);
-        await _db.SaveChangesAsync(ct);
-        return ApiResponse.Success($"Member '{member.FullName}' created with ID {member.Id}.");
-    }
-
     public async Task<ApiResponse<PagedResult<MemberListItemDto>>> GetMembersAsync(PaginationFilter filter, CancellationToken ct = default)
     {
         var query = _db.Members;
@@ -67,21 +38,10 @@ public class MembersService(ILibraryDb _db, IMapper _mapper)
         return ApiResponse<MemberDetailDto>.Success(_mapper.Map<MemberDetailDto>(member));
     }
 
-    public async Task<ApiResponse> UpdateMemberAsync(int id, string fullName, string email, CancellationToken ct = default)
+    public async Task<ApiResponse> UpdateMemberAsync(int id, string fullName, string email, string role, CancellationToken ct = default)
     {
-        if (string.IsNullOrWhiteSpace(fullName))
-            return ApiResponse.Failure("FullName is required.");
-
         var trimmedName = fullName.Trim();
-        if (trimmedName.Length < 2)
-            return ApiResponse.Failure("FullName must be at least 2 characters long.");
-
-        if (string.IsNullOrWhiteSpace(email))
-            return ApiResponse.Failure("Email is required.");
-
         var trimmedEmail = email.Trim().ToLowerInvariant();
-        if (!IsValidEmail(trimmedEmail))
-            return ApiResponse.Failure("Email format is invalid.");
 
         var member = await _db.Members.FindAsync(new object[] { id }, ct);
         if (member == null)
@@ -93,6 +53,7 @@ public class MembersService(ILibraryDb _db, IMapper _mapper)
 
         member.FullName = trimmedName;
         member.Email = trimmedEmail;
+        member.Role = role;
         await _db.SaveChangesAsync(ct);
         return ApiResponse.Success($"Member with ID {id} updated successfully.");
     }
