@@ -1,0 +1,73 @@
+    <section class="panel dashboard-panel">
+      <div class="panel-head">
+        <div>
+          <h2>Overview</h2>
+          <p class="muted">Canli ozet, hizli filtreler ve koleksiyon dagilimi.</p>
+        </div>
+        <div class="inline-actions">
+          <button class="soft" (click)="refresh.emit()">Refresh all</button>
+          <button class="soft" (click)="health.emit()">Health</button>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <article class="stat-card"><span>Books</span><strong>{{ books.length }}</strong></article>
+        <article class="stat-card"><span>Authors</span><strong>{{ authors.length }}</strong></article>
+        <article class="stat-card"><span>Categories</span><strong>{{ categories.length }}</strong></article>
+        <article class="stat-card"><span>Loans</span><strong>{{ loans.length }}</strong></article>
+        <article class="stat-card" *ngIf="isAdmin"><span>Members</span><strong>{{ members.length }}</strong></article>
+        <article class="stat-card"><span>My Member Id</span><strong>{{ memberId ?? '-' }}</strong></article>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="micro-panel">
+          <div class="micro-head">
+            <h3>Loan Status Mix</h3>
+            <span>{{ loans.length }} total</span>
+          </div>
+          <div class="stack-bars">
+            <div class="stack-bars__track">
+              <div class="seg seg-ok" [style.width.%]="statusPct.returned"></div>
+              <div class="seg seg-warn" [style.width.%]="statusPct.overdue"></div>
+              <div class="seg seg-info" [style.width.%]="statusPct.active"></div>
+            </div>
+            <div class="legend-grid">
+              <button class="legend-btn" (click)="openTab.emit('loans')">Returned: {{ counts.returned }}</button>
+              <button class="legend-btn" (click)="openTab.emit('loans')">Overdue: {{ counts.overdue }}</button>
+              <button class="legend-btn" (click)="openTab.emit('loans')">Active: {{ counts.active }}</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="micro-panel">
+          <div class="micro-head">
+            <h3>Category Coverage</h3>
+            <button class="soft" (click)="openTab.emit('books')">Open books</button>
+          </div>
+          <div class="mini-bars">
+            <div class="mini-bars__row" *ngFor="let item of topCategories">
+              <div class="label">{{ item.label }}</div>
+              <div class="bar"><span [style.width.%]="item.percent"></span></div>
+              <div class="value">{{ item.value }}</div>
+            </div>
+            <div class="muted" *ngIf="topCategories.length === 0">No book data yet.</div>
+          </div>
+        </section>
+
+        <section class="micro-panel">
+          <div class="micro-head">
+            <h3>Quick Actions</h3>
+            <span>Navigate</span>
+          </div>
+          <div class="quick-grid">
+            <button class="soft" (click)="openTab.emit('books')">Books</button>
+            <button class="soft" (click)="openTab.emit('authors')">Authors</button>
+            <button class="soft" (click)="openTab.emit('categories')">Categories</button>
+            <button class="soft" (click)="openTab.emit('loans')">Loans</button>
+            <button class="soft" *ngIf="isAdmin" (click)="openTab.emit('members')">Members</button>
+            <button class="soft" (click)="openTab.emit('penalties')">Penalties</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  

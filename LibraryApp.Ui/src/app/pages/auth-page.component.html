@@ -1,0 +1,38 @@
+    <div class="auth-shell">
+      <div class="auth-card panel">
+        <div class="brand-pill">LibraryApp / Angular Console</div>
+        <h1>Library portal access</h1>
+        <p class="muted">API'ye baglanip giris yapin veya yeni uye olusturun.</p>
+
+        <label>API Base URL</label>
+        <input [(ngModel)]="apiBaseUrl" placeholder="http://localhost:5098" />
+
+        <div class="segmented">
+          <button type="button" [class.active]="mode() === 'login'" (click)="mode.set('login')">Login</button>
+          <button type="button" [class.active]="mode() === 'register'" (click)="mode.set('register')">Register</button>
+        </div>
+
+        <form (ngSubmit)="submit()" class="stack">
+          <label *ngIf="mode() === 'register'">Full Name</label>
+          <input *ngIf="mode() === 'register'" [(ngModel)]="registerForm.fullName" name="fullName" placeholder="Ada Lovelace" />
+
+          <label>Email</label>
+          <input [(ngModel)]="email" name="email" type="email" placeholder="admin@library.com" />
+
+          <label>Password</label>
+          <input [(ngModel)]="password" name="password" type="password" placeholder="••••••" />
+
+          <button class="cta" [disabled]="loading()">
+            {{ loading() ? 'Processing...' : (mode() === 'login' ? 'Login' : 'Create account') }}
+          </button>
+        </form>
+
+        <p *ngIf="message()" class="message" [class.error]="messageType() === 'error'">{{ message() }}</p>
+
+        <div class="hint-box">
+          <div><strong>Tip:</strong> Backend launch settings'e gore API genelde <code>http://localhost:5098</code></div>
+          <div><strong>Admin:</strong> <code>admin&#64;library.com</code> / <code>admin123</code> (projendeki mevcut davranisa gore)</div>
+        </div>
+      </div>
+    </div>
+  

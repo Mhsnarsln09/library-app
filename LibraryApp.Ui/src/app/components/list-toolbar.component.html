@@ -1,0 +1,13 @@
+    <div class="list-toolbar">
+      <div class="list-toolbar__main">
+        <input
+          [ngModel]="search"
+          (ngModelChange)="searchChange.emit($event)"
+          [placeholder]="searchPlaceholder"
+        />
+      </div>
+      <div class="list-toolbar__side">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  
