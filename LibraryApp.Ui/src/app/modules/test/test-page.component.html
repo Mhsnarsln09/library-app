@@ -1,0 +1,79 @@
+<section class="test-shell">
+  <header class="test-hero">
+    <div>
+      <p class="eyebrow">Lazy Module Demo</p>
+      <h1>{{ config.title }}</h1>
+      <p>{{ config.description }}</p>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="primary" (click)="load()">Refresh module data</button>
+      <a routerLink="/" class="secondary">Portal'a don</a>
+    </div>
+  </header>
+
+  <section class="module-card">
+    <h2>Module scoped dependency</h2>
+    <p>
+      Bu ekran `TEST_FEATURE_CONFIG` token'ini sadece `TestModule` provider scope'undan aliyor.
+      Ayrica mevcut standalone componentler burada tekrar kullaniliyor.
+    </p>
+  </section>
+
+  @if (error()) {
+    <section class="module-card error-card">
+      <strong>Hata:</strong> {{ error() }}
+    </section>
+  }
+
+  @if (loading()) {
+    <section class="module-card">
+      <p>Veriler yukleniyor...</p>
+    </section>
+  } @else {
+    <app-dashboard-overview
+      [authors]="authors()"
+      [categories]="categories()"
+      [books]="books()"
+      [loans]="loans()"
+      [members]="members()"
+      [isAdmin]="true"
+      (refresh)="load()"
+    />
+
+    <section class="module-card">
+      <div class="card-header">
+        <div>
+          <h2>Author preview</h2>
+          <p>Mevcut toolbar ve pagination componentleri bu module icinde tekrar kullaniliyor.</p>
+        </div>
+        <span class="pill">{{ filteredAuthors().length }} kayit</span>
+      </div>
+
+      <app-list-toolbar
+        [search]="authorSearch()"
+        searchPlaceholder="Author ara"
+        (searchChange)="setSearch($event)"
+      />
+
+      <div class="author-grid">
+        @for (author of pagedAuthors(); track author.id) {
+          <article class="author-card">
+            <span class="author-id">#{{ author.id }}</span>
+            <strong>{{ author.fullName }}</strong>
+          </article>
+        } @empty {
+          <p class="empty-state">Filtreye uyan author bulunamadi.</p>
+        }
+      </div>
+
+      <app-pagination-controls
+        [totalItems]="filteredAuthors().length"
+        [page]="page()"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="config.pageSizeOptions"
+        (pageChange)="setPage($event)"
+      />
+    </section>
+  }
+</section>

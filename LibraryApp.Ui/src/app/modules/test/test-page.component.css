@@ -1,0 +1,132 @@
+.test-shell {
+  display: grid;
+  gap: 1.5rem;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(17, 94, 89, 0.18), transparent 28rem),
+    linear-gradient(180deg, #f5f7f4 0%, #eef2ec 100%);
+  min-height: 100vh;
+}
+
+.test-hero,
+.module-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.test-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0f766e;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: none;
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  background: #115e59;
+  color: #fff;
+}
+
+.secondary {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.module-card {
+  padding: 1.5rem;
+}
+
+.error-card {
+  border-color: rgba(185, 28, 28, 0.25);
+  color: #991b1b;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.pill {
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: #ccfbf1;
+  color: #134e4a;
+  font-weight: 700;
+}
+
+.author-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.author-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdfa 100%);
+  border: 1px solid rgba(17, 94, 89, 0.16);
+}
+
+.author-id {
+  color: #0f766e;
+  font-size: 0.85rem;
+}
+
+.empty-state {
+  margin: 1rem 0 0;
+  color: #475569;
+}
+
+@media (max-width: 720px) {
+  .test-shell {
+    padding: 1rem;
+  }
+
+  .test-hero,
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
